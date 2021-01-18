@@ -1,3 +1,4 @@
+import Position from './Position.js'
 /**
  * The constructor function that takes a Carousel object as an argument and creates a slider for it.
  * 
@@ -15,20 +16,21 @@ function Carousel(carousel) {
     const imageSize = imageArray.length;
     const IMAGE_WIDTH = container.offsetWidth;
     const imagePositionArray = [{}];
+    let animate;
     let indicators;
     let index = 0;
-    let transition = 1000;
-    let holdTime = 1000;
+    let transition = 2000;
+    let holdTime = 3000;
     let shift = 0;
     /**
      * add forward and back button on the carousels
      */
     const addNavigation = function () {
         navContainer.setAttribute('class', 'nav-container');
-        navigationLeft.setAttribute('src', '../images/btn-left.svg');
+        navigationLeft.setAttribute('src', './images/btn-left.svg');
         navigationLeft.setAttribute('class', 'btn-left');
         navigationLeft.setAttribute('alt', 'move left');
-        navigationRight.setAttribute('src', '../images/btn-right.svg');
+        navigationRight.setAttribute('src', './images/btn-right.svg');
         navigationRight.setAttribute('class', 'btn-right');
         navigationRight.setAttribute('alt', 'move right');
         navContainer.appendChild(navigationLeft);
@@ -53,26 +55,38 @@ function Carousel(carousel) {
         imageArray.forEach((element, i) => {
             element.style.left = `${shift}px`;
             imagePositionArray[i] = {
-                'position': `${shift}px`
+                'position': shift
             }
             shift += IMAGE_WIDTH;
         });
     }
 
     const slideImages = function (targetIndex) {
-        imageArray[index].style.left = '1000px';
-        imageArray[targetIndex].style.left = 0 + 'px';
-        // let interval = setInterval(function () {
-        //     let px = 1000;
-
-        //     px += 50;
-        // }, transition / 60);
-
+        let direction = index < targetIndex ? Position.RIGHT : Position.LEFT;
+        let skip = 0;
+        let movePixel = 0;
+        if (direction === Position.RIGHT) {
+            skip = targetIndex - index;
+            movePixel = skip * IMAGE_WIDTH;
+            moveImage(movePixel, Position.RIGHT);
+        } else {
+            skip = index - targetIndex;
+            movePixel = skip * IMAGE_WIDTH;
+            moveImage(movePixel, Position.LEFT);
+        }
         indicators[index].classList.remove('active');
         indicators[targetIndex].classList.add('active');
         index = targetIndex;
-        // setTimeout(clearInterval(interval), holdTime);
     };
+    const moveImage = function (distance, position) {
+        imageArray.forEach((element, i) => {
+            let finalPixel = (position === Position.RIGHT) ? imagePositionArray[i].position - distance : imagePositionArray[i].position + distance;
+            element.style.left = `${finalPixel}px`;
+            imagePositionArray[i] = {
+                'position': finalPixel
+            }
+        });
+    }
     const moveRight = function () {
         return (index + 1) % imageSize;
     };
@@ -107,8 +121,14 @@ function Carousel(carousel) {
      * start the carousel
      */
     this.start = function () {
-
+        animate = setInterval(() => {
+            let startIndex = moveRight();
+            slideImages(startIndex);
+        }, holdTime);
     };
+    this.reset = function () {
+        clearInterval(animate);
+    }
 }
 
 export default Carousel;

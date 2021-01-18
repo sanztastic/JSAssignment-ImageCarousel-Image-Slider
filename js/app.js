@@ -19,5 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
     carousel.forEach(container => {
         const slider = new Carousel(container);
         slider.init();
+        slider.start();
     })
 });
