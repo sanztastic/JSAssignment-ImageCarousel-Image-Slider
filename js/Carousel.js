@@ -100,7 +100,7 @@ function Carousel(carousel) {
         setImagePosition();
         addNavigation();
         addIndicators();
-        indicators = document.querySelectorAll('.indicator-list-content');
+        indicators = container.querySelectorAll('.indicator-list-content');
         indicators[0].classList.add('active');
         navigationLeft.addEventListener('click', () => {
             let nextIndex = moveLeft();
